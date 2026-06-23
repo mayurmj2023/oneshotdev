@@ -1,0 +1,57 @@
+{
+  "name": "oneshotdev",
+  "displayName": "OneShotDev",
+  "description": "One prompt: write code, run & fix tests, deploy to AWS. Supports Claude, OpenAI, and Gemini.",
+  "version": "0.1.0",
+  "publisher": "mayurmj1994",
+  "repository": { "type": "git", "url": "https://github.com/mayurmj1994/oneshotdev" },
+  "icon": "icon.png",
+  "license": "MIT",
+  "keywords": ["ai", "claude", "openai", "gemini", "aws", "deploy", "automation"],
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "oneshotdev.run", "title": "OneShotDev: Build, Fix & Deploy from Prompt" },
+      { "command": "oneshotdev.deployOnly", "title": "OneShotDev: Deploy Current Project to AWS" }
+    ],
+    "configuration": {
+      "title": "OneShotDev",
+      "properties": {
+        "oneshotdev.provider": {
+          "type": "string",
+          "enum": ["claude", "openai", "gemini"],
+          "default": "claude",
+          "description": "Which AI provider to use for code generation."
+        },
+        "oneshotdev.claudeApiKey": { "type": "string", "default": "", "description": "Anthropic API key" },
+        "oneshotdev.openaiApiKey": { "type": "string", "default": "", "description": "OpenAI API key" },
+        "oneshotdev.geminiApiKey": { "type": "string", "default": "", "description": "Google Gemini API key" },
+        "oneshotdev.testCommand": { "type": "string", "default": "npm test", "description": "Command used to run tests after code generation." },
+        "oneshotdev.maxFixAttempts": { "type": "number", "default": 4, "description": "Max number of fix-and-retest loops before giving up." },
+        "oneshotdev.awsRegion": { "type": "string", "default": "us-east-1", "description": "AWS region to deploy to." },
+        "oneshotdev.ecrRepoName": { "type": "string", "default": "oneshotdev-app", "description": "ECR repository name for the built image." },
+        "oneshotdev.appRunnerServiceName": { "type": "string", "default": "oneshotdev-service", "description": "AWS App Runner service name." },
+        "oneshotdev.ecrAccessRoleArn": { "type": "string", "default": "", "description": "IAM role ARN that grants App Runner access to pull from ECR (required). See README for setup." },
+        "oneshotdev.containerPort": { "type": "number", "default": 3000, "description": "Port your app listens on inside the container." }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+    "compile": "tsc -p ./ --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ecr": "^3.700.0",
+    "@aws-sdk/client-apprunner": "^3.700.0",
+    "@aws-sdk/client-sts": "^3.700.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^22.5.0",
+    "typescript": "^5.5.4",
+    "esbuild": "^0.23.0"
+  }
+}
