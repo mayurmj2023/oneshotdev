@@ -39,24 +39,7 @@ vsce package
 ```
 This produces a `.vsix` you can install via *Extensions → ... → Install from VSIX*.
 
-## Publish to the VS Code Marketplace (make it public)
 
-Publisher ID for this project: **mayurmj1994**
-
-1. Get a Personal Access Token from https://dev.azure.com → User settings →
-   Personal Access Tokens → scope: **Marketplace (Manage)**.
-2. Replace the placeholder repo URL in `package.json` (`repository.url`) with
-   your real GitHub repo once it's pushed.
-3. Run:
-   ```bash
-   npm install -g @vscode/vsce
-   vsce login mayurmj1994
-   vsce publish
-   ```
-4. It goes live at `https://marketplace.visualstudio.com/items?itemName=mayurmj1994.oneshotdev`
-   within a few minutes — anyone can install it from the Extensions panel in VS Code.
-
-To update later: bump `"version"` in `package.json`, then `vsce publish` again.
 
 ## Configure (Settings → search "oneshotdev")
 
@@ -108,3 +91,59 @@ You also need, on the machine running VS Code:
   refuses any path that tries to escape it (no `../` traversal).
 - Generated code is never `eval`'d — it's written to disk and run via your
   own test command, same as code you'd write yourself.
+
+
+## OneShotDev — User Guide
+
+### What it does
+OneShotDev turns a single prompt into working code: it generates code and tests, runs a fix loop until tests pass, and can optionally deploy to AWS (ECR/App Runner). It supports multiple AI providers.
+
+---
+
+### Installation
+1. Open **VS Code**.
+2. Go to **Extensions** (`Ctrl+Shift+X`).
+3. Search for `OneShotDev` (or install from `.vsix` — see below).
+4. Click **Install**.
+
+> 💡 **Installing from a `.vsix` file instead:** Extensions panel → `...` menu → **Install from VSIX...** → select the file.
+
+---
+
+### First-time setup
+1. Open the **Command Palette** (`Ctrl+Shift+P`).
+2. Run `OneShotDev: Configure` (or similar — adjust to your actual command ID).
+3. Enter your AI provider API key (e.g., Anthropic, OpenAI — whichever providers you support).
+4. *Optional:* If you plan to use AWS deployment, also provide your AWS credentials/region.
+
+---
+
+### Basic usage
+1. Open the folder/project you want to work in.
+2. Open the **Command Palette** → `OneShotDev: Generate`.
+3. Type your prompt describing what you want built.
+   * *Example:* `"REST API for a todo list with CRUD endpoints"`
+4. OneShotDev will automatically:
+   * Generate the code and tests
+   * Run the tests automatically
+   * **Fix Loop:** If tests fail, it enters a loop—regenerating/patching until they pass (or it hits a retry limit).
+5. Review the generated files in your workspace before committing.
+
+#### Optional: Deploying to AWS
+1. Run `OneShotDev: Deploy` from the Command Palette.
+2. Confirm the target (**ECR repository**, **App Runner service**).
+3. OneShotDev builds, pushes the image, and deploys it.
+4. Check the **Output panel** for the deployed service URL.
+
+---
+
+### Switching AI providers
+1. Open settings (`Ctrl+,`), search for `OneShotDev`.
+2. Choose your preferred provider and model from the dropdown/config field.
+
+---
+
+### Tips
+* **Be specific:** In your prompt, mention the language, framework, and any constraints.
+* **Review code:** Always review generated code before deploying to production.
+* **Debugging loops:** If the fix loop fails repeatedly, check the **Output/Logs panel** for the last error — it usually points to a missing dependency or unclear spec.
